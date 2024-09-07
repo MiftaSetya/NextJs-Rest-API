@@ -14,5 +14,5 @@ export async function PUT(req: NextRequest, { params }: { params: Params }) {
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Params }) {
-    return await handlerDelete(req, { params })
+    return await handlerDelete({ params })
 }

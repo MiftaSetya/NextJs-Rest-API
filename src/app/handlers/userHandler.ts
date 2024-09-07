@@ -9,11 +9,11 @@ export async function handlerGet() {
         if (err instanceof Error) {
             return NextResponse.json({ message: err.message }, { status: 500 });
         }
-        return NextResponse.json({ message: 'Unknown error occurred' }, { status: 500 });
+        return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
     }
 }
 
-export async function handlerGetById({params}: {params: {id: string}}) {
+export async function handlerGetById({ params }: { params: { id: string } }) {
     const id = parseInt(params.id)
 
     try {
@@ -23,9 +23,13 @@ export async function handlerGetById({params}: {params: {id: string}}) {
             }
         })
 
-        return NextResponse.json(user)
+        if (user) {
+            return NextResponse.json(user)
+        } else {
+            return NextResponse.json({ message: 'User Not Found' }, { status: 404 });
+        }
     } catch (err) {
-        return NextResponse.json({ message: 'User Not Found' }, { status: 500 });
+        return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
     }
 }
 
@@ -34,15 +38,15 @@ export async function handlerPost(req: NextRequest) {
         const body = await req.json();
         const { nama } = body;
 
-        const newUser = await prisma.user.create({
+        await prisma.user.create({
             data: { nama }
         });
-        return NextResponse.json(newUser, { status: 201 });
+        return NextResponse.json({ message: "Success create user" }, { status: 201 });
     } catch (err: unknown) {
         if (err instanceof Error) {
             return NextResponse.json({ message: err.message }, { status: 500 });
         }
-        return NextResponse.json({ message: 'Unknown error occurred' }, { status: 500 });
+        return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
     }
 }
 
@@ -50,10 +54,20 @@ export async function handlerPut(req: NextRequest, { params }: { params: { id: s
     const id = parseInt(params.id)
 
     try {
+        const existingUser = await prisma.user.findUnique({
+            where: {
+                id: id
+            }
+        })
+
+        if (!existingUser) {
+            return NextResponse.json({ message: 'User Not Found' }, { status: 404 });
+        }
+
         const body = await req.json()
         const { nama } = body
 
-        const user = await prisma.user.update({
+        await prisma.user.update({
             where: {
                 id: id
             },
@@ -61,23 +75,35 @@ export async function handlerPut(req: NextRequest, { params }: { params: { id: s
                 nama: nama
             }
         })
-        return NextResponse.json(user)
+
+        return NextResponse.json({ messaage: "Success edit user" })
     } catch (error) {
-        return NextResponse.json({ message: 'User Not Found' }, { status: 500 });
+        return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
     }
 }
 
-export async function handlerDelete(req: NextRequest, { params }: { params: { id: string } }) {
+export async function handlerDelete({ params }: { params: { id: string } }) {
     const id = parseInt(params.id)
 
     try {
+        const existingUser = await prisma.user.findUnique({
+            where: {
+                id: id
+            }
+        })
+
+        if (!existingUser) {
+            return NextResponse.json({ message: 'User Not Found' }, { status: 404 });
+        }
+
         await prisma.user.delete({
             where: {
                 id: id
             }
         })
-        return NextResponse.json({message: "Delete user successfull"})
+
+        return NextResponse.json({ message: "Success delete user" })
     } catch (error) {
-        return NextResponse.json({ message: 'User Not Found' }, { status: 500 });
+        return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
     }
 }
