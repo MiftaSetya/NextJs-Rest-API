@@ -68,7 +68,7 @@ export async function handlerPut(req = NextRequest, params) {
             }
         })
 
-        return NextResponse.json({ message: "Update job successfully" })
+        return NextResponse.json({ message: "Success edit job" })
     } catch (err) {
         return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
     }
@@ -94,7 +94,7 @@ export async function handlerDelete(params) {
             }
         })
 
-        return NextResponse.json({ message: "Delete job successfully" })
+        return NextResponse.json({ message: "Success delete job" })
     } catch (err) {
         return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
     }
